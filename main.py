@@ -63,7 +63,6 @@ class Train(luigi.Task):
         return SplitDataset()
 
     def run(self):
-        wandb.init()
 
         train_data = self.input()['train'].path
         test_data = self.input()['test'].path
@@ -89,6 +88,9 @@ class Train(luigi.Task):
             'fp16': False,
             'wandb_project': os.environ['WANDB_PROJECT']
         }
+
+        wandb.init(config=train_args)
+
         model = LanguageModelingModel("gpt2", "gpt2", args=train_args, use_cuda=self.use_cuda)
 
         model.train_model(train_data, eval_file=test_data)
