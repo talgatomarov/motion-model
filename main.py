@@ -25,8 +25,8 @@ class DownloadDataset(luigi.Task):
         return luigi.LocalTarget('./data/motions.txt')
 
 class SplitDataset(luigi.Task):
-    test_size = luigi.Parameter(default=0.1)
-    random_state = luigi.Parameter(default=12)
+    test_size = luigi.FloatParameter(default=0.1)
+    random_state = luigi.FloatParameter(default=12)
 
     def requires(self):
         return DownloadDataset()
@@ -54,10 +54,10 @@ class SplitDataset(luigi.Task):
 
 class Train(luigi.Task):
     use_cuda = luigi.Parameter(default=False)
-    train_batch_size = luigi.Parameter(default=1)
-    num_train_epochs = luigi.Parameter(default=1)
-    learning_rate = luigi.Parameter(default=5e-4)
-    max_seq_length = luigi.Parameter(default=256)
+    train_batch_size = luigi.IntParameter(default=1)
+    num_train_epochs = luigi.IntParameter(default=1)
+    learning_rate = luigi.FloatParameter(default=5e-4)
+    max_seq_length = luigi.IntParameter(default=256)
 
     def requires(self):
         return SplitDataset()
