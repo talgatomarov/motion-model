@@ -16,7 +16,7 @@ class DownloadDataset(luigi.Task):
         client = GCSClient()
 
         bucket = os.environ['GCS_BUCKET']
-        fp = client.download(f"{bucket}/{dataset_path}")
+        fp = client.download(f"{bucket}/{self.dataset_path}")
         self.output().makedirs()
 
         os.replace(fp.name, self.output().path)
