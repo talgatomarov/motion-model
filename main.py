@@ -53,11 +53,16 @@ class SplitDataset(luigi.Task):
 
 
 class Train(luigi.Task):
-    use_cuda = luigi.Parameter(default=False)
+    use_cuda = luigi.BoolParameter()
+    use_early_stopping = luigi.BoolParameter()
+    early_stopping_delta = luigi.FloatParameter(default=0.01)
+    early_stopping_patience = luigi.IntParameter(default=5)
     train_batch_size = luigi.IntParameter(default=1)
     num_train_epochs = luigi.IntParameter(default=1)
     learning_rate = luigi.FloatParameter(default=5e-4)
     max_seq_length = luigi.IntParameter(default=256)
+    block_size = luigi.IntParameter(default=256)
+    gradient_accumulation_steps = luigi.IntParameter(default=1)
 
     def requires(self):
         return SplitDataset()
@@ -74,15 +79,16 @@ class Train(luigi.Task):
         train_args = {
             "reprocess_input_data": True,
             "overwrite_output_dir": True,
-            "block_size": 256,
-            "max_seq_length": 256,
+            "block_size": self.block_size,
+            "max_seq_length": self.max_seq_length,
             "learning_rate": self.learning_rate,
             "train_batch_size": self.train_batch_size,
             "evaluate_during_training":True,
             "save_model_every_epoch": False,
             "save_eval_checkpoints": False,
-            "gradient_accumulation_steps": 1,
+            "gradient_accumulation_steps": self.gradient_accumulation_steps,
             "num_train_epochs": self.num_train_epochs,
+            "use_early_stopping": self.use_early_stopping,
             "mlm": False,
             "output_dir": f"./outputs/fine-tuned/",
             'fp16': False,
